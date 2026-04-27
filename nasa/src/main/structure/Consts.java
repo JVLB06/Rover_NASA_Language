@@ -1,7 +1,8 @@
 package nasa.rover;
+import nasa.rover.Consts;
 
 public class Consts {
-    public static final int[][] matriz = {
+    public static final int[][] matrix = {
             {0, 0, 0, 0, 0},
             {0, 1, 1, 1, 0},
             {0, 1, 0, 1, 0},
@@ -9,7 +10,7 @@ public class Consts {
             {0, 0, 0, 0, 0}
     };
 
-    public static final int walkLimit = matriz[0].length / 4;
+    public static final int walkLimit = matrix[0].length / 4;
     public static final int walkMinimum = 1;
 
     public static final String rules = "";
