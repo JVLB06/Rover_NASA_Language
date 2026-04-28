@@ -17,11 +17,33 @@ public class PrintUtils {
 
     public static void loadPath(int[][] matrix, String commands) {
         char[] commandArray = commands.toCharArray();
+        String pathState = "";
+        String numSequence = "";
+        char lastCommand = ' ';
 
         for (int i = 0; i < commandArray.length; i++) {
             char command = commandArray[i];
-            // Process the command and update the matrix accordingly
-            // This is a placeholder for the actual logic to move the rover
+            if (Character.isDigit(command)) {
+                numSequence += lastCommand + command;
+                lastCommand = command;
+            } else {
+                numSequence = numSequence.isEmpty() ? "1" : numSequence;
+                for (int c = 0; c < Integer.parseInt(numSequence); c++) {
+                    switch (command) {
+                        case 'L':
+                            pathState += "L";
+                            break;
+                        case 'R':
+                            pathState += "R";
+                            break;
+                        case 'F':
+                            pathState += "F";
+                            break;
+                        default:
+                            System.out.println("Invalid command: " + command);
+                    }
+                }
+            }
         }
     }
 }
