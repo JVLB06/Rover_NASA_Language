@@ -15,6 +15,15 @@ public class Consts {
 
     public static final String rules = "";
 
+    public static final String forwardCommand = "F";
+    public static final char forwardChar = 'F';
+    public static final String leftCommand = "L";
+    public static final char leftChar = 'L';
+    public static final String rightCommand = "R";
+    public static final char rightChar = 'R';
+    public static final String turnOverCommand = "T";
+    public static final char turnOverChar = 'T';
+
     public static final String openPhrase = "Hello World";
     public static final String matrixPath = "O";
     public static final String matrixObstacle = "X";

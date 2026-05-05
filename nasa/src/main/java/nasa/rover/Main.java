@@ -1,7 +1,18 @@
 package nasa.rover;
+import nasa.rover.Consts;
+import nasa.rover.Utils;
+import nasa.rover.Language;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Language language = new Language();
+        System.out.println(Consts.openPhrase);
+        System.out.println("Hi rover. This is your board:");
+        Utils.printMatrix(Consts.matrix);
+
+        System.out.println("You can move " + Consts.walkLimit + " steps at a time, but you must move at least " + Consts.walkMinimum + " step.");
+        System.out.println("You can move in 3 directions: left, right and turn over, and walk straight forward.");
+
+        language.phases = language.input.nextLine();
     }
 }
