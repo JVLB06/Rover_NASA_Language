@@ -4,9 +4,12 @@ import nasa.rover.Utils;
 import nasa.rover.Language;
 
 public class Main {
+
+    //Run structure
     public static void main(String[] args) {
         Language language = new Language();
 
+        //Presenting
         System.out.println(Consts.openPhrase);
         System.out.println("Hi rover. This is your board:");
         Utils.printMatrix(Consts.matrix);
@@ -16,10 +19,12 @@ public class Main {
 
         Utils.printMatrix(Consts.matrix);
 
+        //Receive and execute commands
         language.setPhases(language.getInput().nextLine());
         language.setCommands(Utils.loadPath(Consts.matrix, language.getPhases()));
         language.setMatrixUsedPath(Utils.markPath(Consts.matrix, language.getCommands()));
 
+        //Present last result
         Utils.printEndMatrix(language.getMatrixUsedPath());
     }
 }
