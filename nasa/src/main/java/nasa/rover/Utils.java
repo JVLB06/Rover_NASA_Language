@@ -36,42 +36,60 @@ public class Utils {
 
     //Function to read the command and convert to a iterable line of commands
     public static String loadPath(int[][] matrix, String commands) {
+
         char[] commandArray = commands.toCharArray();
-        String pathState = "";
-        String numSequence = "";
-        char lastCommand = ' ';
+
+        StringBuilder pathState = new StringBuilder();
+        StringBuilder numSequence = new StringBuilder();
 
         for (int i = 0; i < commandArray.length; i++) {
+
             char command = commandArray[i];
-            //Define as number of iterations or code
+
+            // Accumulate digits
             if (Character.isDigit(command)) {
-                numSequence += lastCommand + command;
-                lastCommand = command;
+
+                numSequence.append(command);
+
             } else {
-                //Multiply the command by the number of iterations defined before
-                numSequence = numSequence.isEmpty() ? "1" : numSequence;
-                for (int c = 0; c < Integer.parseInt(numSequence); c++) {
+
+                // If no number before command, default = 1
+                int multiplier = numSequence.length() == 0
+                        ? 1
+                        : Integer.parseInt(numSequence.toString());
+
+                // Repeat command
+                for (int c = 0; c < multiplier; c++) {
+
                     switch (command) {
+
                         case Consts.leftChar:
-                            pathState += Consts.leftCommand;
+                            pathState.append(Consts.leftCommand);
                             break;
+
                         case Consts.rightChar:
-                            pathState += Consts.rightCommand;
+                            pathState.append(Consts.rightCommand);
                             break;
+
                         case Consts.forwardChar:
-                            pathState += Consts.forwardCommand;
+                            pathState.append(Consts.forwardCommand);
                             break;
+
                         case Consts.turnOverChar:
-                            pathState += Consts.turnOverCommand;
+                            pathState.append(Consts.turnOverCommand);
+                            break;
+
                         default:
                             System.out.println("Invalid command: " + command);
                     }
                 }
+
+                // Reset number accumulator
+                numSequence.setLength(0);
             }
         }
 
-        return pathState;
-
+        return pathState.toString();
     }
 
     //Function to mark the path on the matrix based on the commands
