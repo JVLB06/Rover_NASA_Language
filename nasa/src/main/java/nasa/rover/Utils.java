@@ -94,10 +94,14 @@ public class Utils {
 
     //Function to mark the path on the matrix based on the commands
     public static int[][] markPath(int[][] matrix, String path) {
-        
+
         int direction = 0;
         int lastDirection = 0;
         int countDirection = 0;
+
+        // Current rover position (starts at top-left corner)
+        int currentX = 0;
+        int currentY = 0;
 
         //Generate base Matrix
         int[][] markedMatrix = new int[matrix.length][matrix[0].length];
@@ -107,21 +111,27 @@ public class Utils {
             }
         }
 
+        // Mark starting position as visited
+        markedMatrix[currentX][currentY] = 2;
+
         //Define directions based on the command
         for (int i = 0; i < path.length(); i++) {
             char command = path.charAt(i);
             switch (command) {
                 case Consts.leftChar:
-                    direction -= 1;
+                    direction = (direction - 1 + 4) % 4;
+                    countDirection = 0;
                     break;
                 case Consts.rightChar:
-                    direction += 1;
+                    direction = (direction + 1) % 4;
+                    countDirection = 0;
                     break;
                 case Consts.forwardChar:
-                    direction += 0;
+                    // no direction change
                     break;
                 case Consts.turnOverChar:
-                    direction += 2;
+                    direction = (direction + 2) % 4;
+                    countDirection = 0;
                     break;
                 default:
                     System.out.println("Invalid command in path: " + command);
@@ -129,45 +139,66 @@ public class Utils {
 
             //Move forward in the corresponding direction
             if (command == Consts.forwardChar) {
-                int x = 0, y = 0;
-                switch (direction % 4) {
+                int dx = 0, dy = 0;
+                switch (direction) {
                     case 0: // Up
-                        x = -1;
+                        dx = -1;
                         break;
                     case 1: // Right
-                        y = 1;
+                        dy = 1;
                         break;
                     case 2: // Down
-                        x = 1;
+                        dx = 1;
                         break;
                     case 3: // Left
-                        y = -1;
+                        dy = -1;
                         break;
                 }
-                //Check direction change
+
+                // Count consecutive steps in the same direction
                 if (direction == lastDirection) {
                     countDirection++;
                 } else {
-                    countDirection ++;
+                    countDirection = 1;
                 }
                 lastDirection = direction;
 
-                int newX = Math.max(0, Math.min(markedMatrix.length - 1, x));
-                int newY = Math.max(0, Math.min(markedMatrix[0].length - 1, y));
-                
-                //Validate erros during the movement
-                if (markedMatrix[newX][newY] == 1) {
-                    System.out.println("Encountered an obstacle at (" + newX + ", " + newY + "). Stopping.");
-                    return markedMatrix; 
-                }
+                // Validate walk limit
                 if (countDirection > Consts.walkLimit) {
                     System.out.println("You walked too much in the same direction. Stopping.");
-                    return markedMatrix; 
+                    break;
                 }
+
+                int newX = currentX + dx;
+                int newY = currentY + dy;
+
+                // Validate bounds
+                if (newX < 0 || newX >= markedMatrix.length || newY < 0 || newY >= markedMatrix[0].length) {
+                    System.out.println("Out of bounds at (" + newX + ", " + newY + "). Stopping.");
+                    break;
+                }
+
+                // Validate obstacle
+                if (markedMatrix[newX][newY] == 1) {
+                    System.out.println("Encountered an obstacle at (" + newX + ", " + newY + "). Stopping.");
+                    break;
+                }
+
+                // Mark current cell as visited before moving
+                markedMatrix[currentX][currentY] = 2;
+
+                // Update rover position
+                currentX = newX;
+                currentY = newY;
+
+                // Mark new position as rover
+                markedMatrix[currentX][currentY] = 3;
             }
         }
 
-        return markedMatrix;
+        // Ensure final position is marked as rover
+        markedMatrix[currentX][currentY] = 3;
 
+        return markedMatrix;
     }
 }
