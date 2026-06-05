@@ -27,7 +27,7 @@ public class Consts {
     public static final String turnOverCommand = "T";
     public static final char turnOverChar = 'T';
 
-    public static final String openPhrase = "Hello World";
+    public static final String openPhrase = "Hi rover. This is your board:";
     public static final String matrixPath = "O";
     public static final String matrixObstacle = "X";
     public static final String matrixVisited = "*";
