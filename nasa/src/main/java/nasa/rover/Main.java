@@ -79,6 +79,14 @@ public class Main {
 
         //Receive and execute commands
         language.setPhases(language.getInput().nextLine());
+
+        // Validate syntax and parameters before executing
+        if (!Utils.validateCommands(language.getPhases())) {
+            System.out.println();
+            System.out.println("Execution aborted due to errors above. Please fix your command and try again.");
+            return;
+        }
+
         language.setCommands(Utils.loadPath(Consts.matrix, language.getPhases()));
         language.setMatrixUsedPath(Utils.markPath(Consts.matrix, language.getCommands()));
         
@@ -91,5 +99,11 @@ public class Main {
         
         //Present last result
         Utils.printEndMatrix(language.getMatrixUsedPath());
+
+        // Display final rover state: position and direction
+        int finalDir = Utils.getFinalDirection(language.getCommands());
+        int[] finalPos = Utils.getFinalPosition(language.getMatrixUsedPath());
+        System.out.println();
+        System.out.println(String.format(Consts.resultSummary, finalPos[0], finalPos[1], Consts.directionNames[finalDir]));
     }
 }

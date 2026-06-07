@@ -32,4 +32,19 @@ public class Consts {
     public static final String matrixObstacle = "X";
     public static final String matrixVisited = "*";
     public static final String matrixRover = "R";
+
+    // Validation error messages
+    public static final String errorInvalidCommand   = "Syntax error: unknown command '%s' at position %d.";
+    public static final String errorInvalidParam     = "Parameter error: value '%s' is out of range (min: %d, max: %d) at position %d.";
+    public static final String errorMissingCommand   = "Syntax error: number '%s' at position %d is not followed by a valid command.";
+    public static final String errorEmptyInput       = "Syntax error: empty input. Please enter at least one command.";
+
+    // Cardinal direction names (index matches direction int: 0=N, 1=E, 2=S, 3=W)
+    public static final String[] directionNames      = {"North (N)", "East (E)", "South (S)", "West (W)"};
+
+    // Initial direction of the rover (1 = East)
+    public static final int initialDirection         = 1;
+
+    // Final result message
+    public static final String resultSummary         = "Rover stopped at position (%d, %d) facing %s.";
 }
