@@ -34,6 +34,69 @@ public class Utils {
         }
     }
 
+    //Function to validate the syntax and parameters of the command string
+    //Returns true if valid, false if any error is found (errors are printed to stdout)
+    public static boolean validateCommands(String commands) {
+
+        // Empty input check
+        if (commands == null || commands.trim().isEmpty()) {
+            System.out.println(Consts.errorEmptyInput);
+            return false;
+        }
+
+        char[] commandArray = commands.toCharArray();
+        boolean hasError = false;
+        StringBuilder numSequence = new StringBuilder();
+
+        for (int i = 0; i < commandArray.length; i++) {
+            char c = commandArray[i];
+
+            if (Character.isDigit(c)) {
+                // Accumulate digits
+                numSequence.append(c);
+
+            } else {
+                // Check if it is a known command
+                boolean isKnown = (c == Consts.forwardChar
+                        || c == Consts.leftChar
+                        || c == Consts.rightChar
+                        || c == Consts.turnOverChar);
+
+                if (!isKnown) {
+                    // Unknown command character
+                    System.out.println(String.format(Consts.errorInvalidCommand, c, i));
+                    hasError = true;
+                    numSequence.setLength(0);
+                    continue;
+                }
+
+                // Validate numeric parameter if present
+                if (numSequence.length() > 0) {
+                    int value = Integer.parseInt(numSequence.toString());
+                    int paramStart = i - numSequence.length();
+
+                    if (value < Consts.walkMinimum || value > Consts.walkLimit) {
+                        System.out.println(String.format(
+                                Consts.errorInvalidParam,
+                                numSequence.toString(), Consts.walkMinimum, Consts.walkLimit, paramStart));
+                        hasError = true;
+                    }
+                    numSequence.setLength(0);
+                }
+            }
+        }
+
+        // Trailing digits with no command after them
+        if (numSequence.length() > 0) {
+            int paramStart = commandArray.length - numSequence.length();
+            System.out.println(String.format(
+                    Consts.errorMissingCommand, numSequence.toString(), paramStart));
+            hasError = true;
+        }
+
+        return !hasError;
+    }
+
     //Function to read the command and convert to a iterable line of commands
     public static String loadPath(int[][] matrix, String commands) {
 
@@ -95,8 +158,8 @@ public class Utils {
     //Function to mark the path on the matrix based on the commands
     public static int[][] markPath(int[][] matrix, String path) {
 
-        int direction = 0;
-        int lastDirection = 0;
+        int direction = Consts.initialDirection;
+        int lastDirection = Consts.initialDirection;
         int countDirection = 0;
 
         // Current rover position (starts at top-left corner)
@@ -201,4 +264,41 @@ public class Utils {
 
         return markedMatrix;
     }
+    //Function to calculate the final direction (int) after executing the full path
+    //Returns: 0=North, 1=East, 2=South, 3=West
+    public static int getFinalDirection(String path) {
+        int direction = Consts.initialDirection;
+        for (int i = 0; i < path.length(); i++) {
+            char command = path.charAt(i);
+            switch (command) {
+                case Consts.leftChar:
+                    direction = (direction - 1 + 4) % 4;
+                    break;
+                case Consts.rightChar:
+                    direction = (direction + 1) % 4;
+                    break;
+                case Consts.turnOverChar:
+                    direction = (direction + 2) % 4;
+                    break;
+                default:
+                    // forwardChar and others do not change direction
+                    break;
+            }
+        }
+        return direction;
+    }
+
+    //Function to find the final rover position (cell marked as 3) in the result matrix
+    //Returns int[]{x, y} or int[]{-1, -1} if not found
+    public static int[] getFinalPosition(int[][] markedMatrix) {
+        for (int i = 0; i < markedMatrix.length; i++) {
+            for (int j = 0; j < markedMatrix[i].length; j++) {
+                if (markedMatrix[i][j] == 3) {
+                    return new int[]{i, j};
+                }
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
 }
