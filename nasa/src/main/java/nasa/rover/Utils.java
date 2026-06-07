@@ -1,7 +1,21 @@
 package nasa.rover;
 import nasa.rover.Consts;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Utils {
+
+    //Inner class to hold the result of a path execution:
+    //the updated matrix and the trail in chronological order
+    public static class PathResult {
+        public final int[][] matrix;
+        public final List<int[]> trail;
+
+        public PathResult(int[][] matrix, List<int[]> trail) {
+            this.matrix = matrix;
+            this.trail  = trail;
+        }
+    }
 
     //Print base Matrix
     public static void printMatrix(int[][] matrix) {
@@ -194,15 +208,30 @@ public class Utils {
     }
 
     //Function to mark the path on the matrix based on the commands
+    //Overload: starts from default initial state (position 0,0 and initial direction)
     public static int[][] markPath(int[][] matrix, String path) {
+        return executePath(matrix, path, 0, 0, Consts.initialDirection, 0).matrix;
+    }
 
-        int direction = Consts.initialDirection;
-        int lastDirection = Consts.initialDirection;
-        int countDirection = 0;
+    //Function to mark the path on the matrix based on the commands
+    //Receives initial rover state to continue execution from a previous call
+    public static int[][] markPath(int[][] matrix, String path, int startX, int startY, int startDirection, int startCountDirection) {
+        return executePath(matrix, path, startX, startY, startDirection, startCountDirection).matrix;
+    }
 
-        // Current rover position (starts at top-left corner)
-        int currentX = 0;
-        int currentY = 0;
+    //Core execution function: runs the path and returns both the updated matrix
+    //and the trail in chronological order of positions visited
+    public static PathResult executePath(int[][] matrix, String path, int startX, int startY, int startDirection, int startCountDirection) {
+
+        int direction = startDirection;
+        // lastDirection starts as -1 so the first F after a turn or a new line
+        // is not incorrectly counted as a continuation of the previous run
+        int lastDirection = startCountDirection > 0 ? startDirection : -1;
+        int countDirection = startCountDirection;
+
+        // Current rover position
+        int currentX = startX;
+        int currentY = startY;
 
         //Generate base Matrix
         int[][] markedMatrix = new int[matrix.length][matrix[0].length];
@@ -211,6 +240,10 @@ public class Utils {
                 markedMatrix[i][j] = matrix[i][j];
             }
         }
+
+        // Trail in chronological order — starting position is the first entry
+        List<int[]> trail = new ArrayList<>();
+        trail.add(new int[]{currentX, currentY});
 
         // Mark starting position as visited
         markedMatrix[currentX][currentY] = 2;
@@ -292,6 +325,9 @@ public class Utils {
                 currentX = newX;
                 currentY = newY;
 
+                // Record new position in the trail
+                trail.add(new int[]{currentX, currentY});
+
                 // Mark new position as rover
                 markedMatrix[currentX][currentY] = 3;
             }
@@ -300,13 +336,37 @@ public class Utils {
         // Ensure final position is marked as rover
         markedMatrix[currentX][currentY] = 3;
 
-        return markedMatrix;
+        return new PathResult(markedMatrix, trail);
     }
 
     //Function to calculate the final direction (int) after executing the full path
     //Returns: 0=North, 1=East, 2=South, 3=West
     public static int getFinalDirection(String path) {
         int direction = Consts.initialDirection;
+        for (int i = 0; i < path.length(); i++) {
+            char command = path.charAt(i);
+            switch (command) {
+                case Consts.leftChar:
+                    direction = (direction - 1 + 4) % 4;
+                    break;
+                case Consts.rightChar:
+                    direction = (direction + 1) % 4;
+                    break;
+                case Consts.turnOverChar:
+                    direction = (direction + 2) % 4;
+                    break;
+                default:
+                    // forwardChar and others do not change direction
+                    break;
+            }
+        }
+        return direction;
+    }
+
+    //Function to calculate the final direction starting from a given direction
+    //Used to continue direction tracking across multiple command lines
+    public static int getFinalDirection(String path, int startDirection) {
+        int direction = startDirection;
         for (int i = 0; i < path.length(); i++) {
             char command = path.charAt(i);
             switch (command) {
@@ -338,6 +398,16 @@ public class Utils {
             }
         }
         return new int[]{-1, -1};
+    }
+
+    //Helper to format a trail list as a readable string: (0,0) -> (0,1) -> ...
+    public static String formatTrail(List<int[]> trail) {
+        StringBuilder sb = new StringBuilder();
+        for (int t = 0; t < trail.size(); t++) {
+            sb.append("(").append(trail.get(t)[0]).append(",").append(trail.get(t)[1]).append(")");
+            if (t < trail.size() - 1) sb.append(" -> ");
+        }
+        return sb.toString();
     }
 
 }
