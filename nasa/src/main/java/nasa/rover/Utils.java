@@ -2,34 +2,72 @@ package nasa.rover;
 import nasa.rover.Consts;
 
 public class Utils {
+
     //Print base Matrix
     public static void printMatrix(int[][] matrix) {
+        int cols = matrix[0].length;
+
+        // Column index header
+        System.out.print("     ");
+        for (int j = 0; j < cols; j++) System.out.printf(" %-2d ", j);
+        System.out.println();
+
+        // Horizontal border line
+        System.out.print("  +");
+        for (int j = 0; j < cols; j++) System.out.print("---+");
+        System.out.println();
+
         for (int i = 0; i < matrix.length; i++) {
+            System.out.printf("%2d |", i);
             for (int j = 0; j < matrix[i].length; j++) {
                 if (matrix[i][j] == 1) {
-                    System.out.print(Consts.matrixObstacle + " ");
+                    System.out.print(Consts.matrixObstacle + "|");
                 } else {
-                    System.out.print(Consts.matrixPath + " ");
+                    System.out.print(Consts.matrixPath + "|");
                 }
             }
+            System.out.println();
+
+            // Row separator
+            System.out.print("  +");
+            for (int j = 0; j < cols; j++) System.out.print("---+");
             System.out.println();
         }
     }
 
     //Print end Matrix
-    public static void printEndMatrix(int[][] matrix) {
+    //Receives final direction to show the rover arrow pointing correctly
+    public static void printEndMatrix(int[][] matrix, int finalDirection) {
+        int cols = matrix[0].length;
+
+        // Column index header
+        System.out.print("     ");
+        for (int j = 0; j < cols; j++) System.out.printf(" %-2d ", j);
+        System.out.println();
+
+        // Horizontal border line
+        System.out.print("  +");
+        for (int j = 0; j < cols; j++) System.out.print("---+");
+        System.out.println();
+
         for (int i = 0; i < matrix.length; i++) {
+            System.out.printf("%2d |", i);
             for (int j = 0; j < matrix[i].length; j++) {
                 if (matrix[i][j] == 1) {
-                    System.out.print(Consts.matrixObstacle + " ");
+                    System.out.print(Consts.matrixObstacle + "|");
                 } else if (matrix[i][j] == 2) {
-                    System.out.print(Consts.matrixVisited + " ");
+                    System.out.print(Consts.matrixVisited + "|");
                 } else if (matrix[i][j] == 3) {
-                    System.out.print(Consts.matrixRover + " ");
+                    System.out.print(Consts.roverArrow[finalDirection] + "|");
                 } else {
-                    System.out.print(Consts.matrixPath + " ");
+                    System.out.print(Consts.matrixPath + "|");
                 }
             }
+            System.out.println();
+
+            // Row separator
+            System.out.print("  +");
+            for (int j = 0; j < cols; j++) System.out.print("---+");
             System.out.println();
         }
     }
@@ -204,16 +242,16 @@ public class Utils {
             if (command == Consts.forwardChar) {
                 int dx = 0, dy = 0;
                 switch (direction) {
-                    case 0: // Up
+                    case 0: // Up (North)
                         dx = -1;
                         break;
-                    case 1: // Right
+                    case 1: // Right (East)
                         dy = 1;
                         break;
-                    case 2: // Down
+                    case 2: // Down (South)
                         dx = 1;
                         break;
-                    case 3: // Left
+                    case 3: // Left (West)
                         dy = -1;
                         break;
                 }
@@ -228,7 +266,7 @@ public class Utils {
 
                 // Validate walk limit
                 if (countDirection > Consts.walkLimit) {
-                    System.out.println("You walked too much in the same direction. Stopping.");
+                    System.out.println("  [!] You walked too much in the same direction. Stopping.");
                     break;
                 }
 
@@ -237,13 +275,13 @@ public class Utils {
 
                 // Validate bounds
                 if (newX < 0 || newX >= markedMatrix.length || newY < 0 || newY >= markedMatrix[0].length) {
-                    System.out.println("Out of bounds at (" + newX + ", " + newY + "). Stopping.");
+                    System.out.println("  [!] Out of bounds at (" + newX + ", " + newY + "). Stopping.");
                     break;
                 }
 
                 // Validate obstacle
                 if (markedMatrix[newX][newY] == 1) {
-                    System.out.println("Encountered an obstacle at (" + newX + ", " + newY + "). Stopping.");
+                    System.out.println("  [!] Encountered an obstacle at (" + newX + ", " + newY + "). Stopping.");
                     break;
                 }
 
@@ -264,6 +302,7 @@ public class Utils {
 
         return markedMatrix;
     }
+
     //Function to calculate the final direction (int) after executing the full path
     //Returns: 0=North, 1=East, 2=South, 3=West
     public static int getFinalDirection(String path) {
