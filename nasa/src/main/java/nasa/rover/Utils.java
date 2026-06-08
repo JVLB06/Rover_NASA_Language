@@ -93,6 +93,9 @@ public class Utils {
     //Returns true if valid, false if any error is found (errors are printed to stdout)
     public static boolean validateCommands(String commands) {
 
+        commands = commands.replace(" ", "");
+
+        
         // Empty input check
         if (commands == null || commands.trim().isEmpty()) {
             System.out.println(Consts.errorEmptyInput);
