@@ -93,9 +93,6 @@ public class Utils {
     //Returns true if valid, false if any error is found (errors are printed to stdout)
     public static boolean validateCommands(String commands) {
 
-        commands = commands.replace(" ", "");
-
-        
         // Empty input check
         if (commands == null || commands.trim().isEmpty()) {
             System.out.println(Consts.errorEmptyInput);
@@ -108,6 +105,11 @@ public class Utils {
 
         for (int i = 0; i < commandArray.length; i++) {
             char c = commandArray[i];
+
+            // Spaces are allowed between number and command (e.g. "4 F" == "4F")
+            if (c == ' ') {
+                continue;
+            }
 
             if (Character.isDigit(c)) {
                 // Accumulate digits
@@ -166,6 +168,11 @@ public class Utils {
         for (int i = 0; i < commandArray.length; i++) {
 
             char command = commandArray[i];
+
+            // Spaces are allowed between number and command (e.g. "4 F" == "4F")
+            if (command == ' ') {
+                continue;
+            }
 
             // Accumulate digits
             if (Character.isDigit(command)) {
