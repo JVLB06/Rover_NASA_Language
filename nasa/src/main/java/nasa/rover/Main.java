@@ -171,16 +171,15 @@ public class Main {
             List<int[]> newSteps = cmdTrail.size() > 1 ? cmdTrail.subList(1, cmdTrail.size()) : new ArrayList<>();
             fullTrail.addAll(newSteps);
 
-            // Stop only if rover had forward commands but still did not move (collision or wall)
-            boolean hadForward = expanded.contains(Consts.forwardCommand);
-            if (hadForward && posAfter[0] == currentX && posAfter[1] == currentY) {
+            // Update rover state for next iteration
+            currentX      = posAfter[0];
+            currentY      = posAfter[1];
+            currentDir    = dirAfter;
+            currentMatrix = pr.matrix;
+
+            // Stop if executePath reported a collision or out of bounds
+            if (pr.stopped) {
                 stopped = true;
-            } else {
-                // Update state for next iteration
-                currentX      = posAfter[0];
-                currentY      = posAfter[1];
-                currentDir    = dirAfter;
-                currentMatrix = pr.matrix;
             }
         }
 

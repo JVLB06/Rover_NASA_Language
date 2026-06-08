@@ -10,10 +10,13 @@ public class Utils {
     public static class PathResult {
         public final int[][] matrix;
         public final List<int[]> trail;
+        //True if execution stopped early due to collision or out of bounds
+        public final boolean stopped;
 
-        public PathResult(int[][] matrix, List<int[]> trail) {
-            this.matrix = matrix;
-            this.trail  = trail;
+        public PathResult(int[][] matrix, List<int[]> trail, boolean stopped) {
+            this.matrix  = matrix;
+            this.trail   = trail;
+            this.stopped = stopped;
         }
     }
 
@@ -224,10 +227,6 @@ public class Utils {
     public static PathResult executePath(int[][] matrix, String path, int startX, int startY, int startDirection, int startCountDirection) {
 
         int direction = startDirection;
-        // lastDirection starts as -1 so the first F after a turn or a new line
-        // is not incorrectly counted as a continuation of the previous run
-        int lastDirection = startCountDirection > 0 ? startDirection : -1;
-        int countDirection = startCountDirection;
 
         // Current rover position
         int currentX = startX;
@@ -254,18 +253,15 @@ public class Utils {
             switch (command) {
                 case Consts.leftChar:
                     direction = (direction - 1 + 4) % 4;
-                    countDirection = 0;
                     break;
                 case Consts.rightChar:
                     direction = (direction + 1) % 4;
-                    countDirection = 0;
                     break;
                 case Consts.forwardChar:
                     // no direction change
                     break;
                 case Consts.turnOverChar:
                     direction = (direction + 2) % 4;
-                    countDirection = 0;
                     break;
                 default:
                     System.out.println("Invalid command in path: " + command);
@@ -289,33 +285,21 @@ public class Utils {
                         break;
                 }
 
-                // Count consecutive steps in the same direction
-                if (direction == lastDirection) {
-                    countDirection++;
-                } else {
-                    countDirection = 1;
-                }
-                lastDirection = direction;
-
-                // Validate walk limit
-                if (countDirection > Consts.walkLimit) {
-                    System.out.println("  [!] You walked too much in the same direction. Stopping.");
-                    break;
-                }
-
                 int newX = currentX + dx;
                 int newY = currentY + dy;
 
                 // Validate bounds
                 if (newX < 0 || newX >= markedMatrix.length || newY < 0 || newY >= markedMatrix[0].length) {
                     System.out.println("  [!] Out of bounds at (" + newX + ", " + newY + "). Stopping.");
-                    break;
+                    markedMatrix[currentX][currentY] = 3;
+                    return new PathResult(markedMatrix, trail, true);
                 }
 
                 // Validate obstacle
                 if (markedMatrix[newX][newY] == 1) {
                     System.out.println("  [!] Encountered an obstacle at (" + newX + ", " + newY + "). Stopping.");
-                    break;
+                    markedMatrix[currentX][currentY] = 3;
+                    return new PathResult(markedMatrix, trail, true);
                 }
 
                 // Mark current cell as visited before moving
@@ -336,7 +320,7 @@ public class Utils {
         // Ensure final position is marked as rover
         markedMatrix[currentX][currentY] = 3;
 
-        return new PathResult(markedMatrix, trail);
+        return new PathResult(markedMatrix, trail, false);
     }
 
     //Function to calculate the final direction (int) after executing the full path
